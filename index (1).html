@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kamilor Hub - Script Executor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #16213e 100%);
+            color: #ffffff;
+            font-family: 'Orbitron', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #00ff88, #00d4ff, #ff00ff, #ffaa00);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease infinite;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        
+        .scripts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        
+        .script-card {
+            background: rgba(20, 20, 40, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 15px;
+            padding: 25px;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 0 20px rgba(0, 255, 136, 0.3),
+                inset 0 0 20px rgba(0, 255, 136, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .script-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 136, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .script-card:hover::before {
+            left: 100%;
+        }
+        
+        .script-card:hover {
+            transform: translateY(-10px);
+            border-color: #00d4ff;
+            box-shadow: 
+                0 0 40px rgba(0, 212, 255, 0.6),
+                inset 0 0 30px rgba(0, 212, 255, 0.2);
+        }
+        
+        .script-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #00d4ff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+        }
+        
+        .script-desc {
+            color: #b0b0b0;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+        
+        .script-code {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: #00ff88;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            user-select: all;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .script-code:hover {
+            background: rgba(0, 255, 136, 0.1);
+            border-color: #00ff88;
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+        }
+        
+        .copy-btn {
+            background: linear-gradient(45deg, #00ff88, #00d4ff);
+            border: none;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.4);
+        }
+        
+        .copy-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.6);
+            background: linear-gradient(45deg, #00d4ff, #00ff88);
+        }
+        
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #00ff88;
+            border-radius: 50%;
+            animation: float 6s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+            .scripts-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="logo">KAMILOR HUB</h1>
+            <p class="subtitle">Executor de Scripts Premium para Roblox</p>
+        </div>
+        
+        <div class="scripts-grid">
+            <div class="script-card">
+                <h3 class="script-title">Mega Hub Kamiloowr</h3>
+                <p class="script-desc">Script principal multi-juego con cientos de funciones: Auto Farm, ESP, Teleport, God Mode y más. Compatible con los juegos más populares de Roblox.</p>
+                <div class="script-code" onclick="copyScript(this)">loadstring(game:HttpGet("https://gist.githubusercontent.com/pavronal-ai/5278f45564b0651acbe32e935cc6c6d4/raw/e43f4c93a4eab95457bd590c39bc9e332cba342c/Mega%20hub%20kamiloowr.lua"))()</div>
+                <button class="copy-btn" onclick="copyScript(this.parentNode.querySelector('.script-code'))">COPIAR SCRIPT</button>
+            </div>
+            
+            <div class="script-card">
+                <h3 class="script-title">New Menu v11</h3>
+                <p class="script-desc">Nuevo menú optimizado con interfaz moderna. Incluye anti-detección, speed hacks, fly y todas las funciones esenciales actualizadas.</p>
+                <div class="script-code" onclick="copyScript(this)">loadstring(game:HttpGet("https://gist.githubusercontent.com/pavronal-ai/3cc3278374fd39fb3f2c9c0259f8f5a3/raw/1d3d7d2ad8367df7032c9cb6812d33d4503a0f41/New%20script%20hub%20v11.lua"))()</div>
+                <button class="copy-btn" onclick="copyScript(this.parentNode.querySelector('.script-code'))">COPIAR SCRIPT</button>
+            </div>
+            
+            <div class="script-card">
+                <h3 class="script-title">Mega Hub Kamilor</h3>
+                <p class="script-desc">Hub completo con scripts exclusivos para maximizar ganancias, items y XP. Incluye auto-collect, duplicación y boosts permanentes.</p>
+                <div class="script-code" onclick="copyScript(this)">loadstring(game:HttpGet("https://gist.githubusercontent.com/pavronal-ai/d384f7234a20751e56a243b52e3caa62/raw/5dcaf3cbb1cc6efd51155f80ec1ec039dd4823a5/Mega%20hub%20kamilor.lua"))()</div>
+                <button class="copy-btn" onclick="copyScript(this.parentNode.querySelector('.script-code'))">COPIAR SCRIPT</button>
+            </div>
+            
+            <div class="script-card">
+                <h3 class="script-title">Script Mega Menu Boost</h3>
+                <p class="script-desc">Boost masivo de velocidad, salto y recursos. Perfecto para grinding rápido y superar niveles difíciles en cualquier juego.</p>
+                <div class="script-code" onclick="copyScript(this)">loadstring(game:HttpGet("https://gist.githubusercontent.com/pavronal-ai/43f1362e26963efc9019661054ca2d02/raw/364ebbea35cc56b038e33b870c7449c999442ca4/Script%20boost%20.lua"))()</div>
+                <button class="copy-btn" onclick="copyScript(this.parentNode.querySelector('.script-code'))">COPIAR SCRIPT</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Copiar script al portapapeles
+        function copyScript(element) {
+            const text = element.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = element.parentNode.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = '¡COPIADO!';
+                btn.style.background = 'linear-gradient(45deg, #ff00ff, #ffaa00)';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = 'linear-gradient(45deg, #00ff88, #00d4ff)';
+                }, 1500);
+            });
+        }
+        
+        // Partículas flotantes
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 6 + 's';
+                particle.style.animationDuration = (Math.random() * 3 + 4) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Inicializar partículas
+        createParticles();
+        
+        // Efecto parallax en scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const particles = document.querySelectorAll('.particle');
+            particles.forEach((particle, i) => {
+                const speed = i * 0.015;
+                particle.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
+    </script>
+</body>
+</html>
