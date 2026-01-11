@@ -1,2 +1,2 @@
 # Kqmilor-hub-6
-[pagina] (18090908a8073183996b46fbf32e971ff56216ae)
+] (https://github.com/pavronal-ai/Kqmilor-hub-6/blob/e938309873971923d738a7c9f57bcd84b2b954a0/index%20(1).html)
